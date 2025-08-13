@@ -15,8 +15,8 @@ final class TasksViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Задачи"
         view.backgroundColor = .systemBackground
+        configureNavigationBar()
         setupTableView()
         presenter?.viewDidLoad()
     }
@@ -78,6 +78,16 @@ extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
         }
         
         return cell
+    }
+    
+    private func configureNavigationBar() {
+        let titleLabel = UILabel()
+        titleLabel.text = "Задачи"
+        titleLabel.textAlignment = .left
+        titleLabel.font = UIFont(name: "SFProText-Bold", size: 32) ?? .systemFont(ofSize: 32, weight: .bold)
+        titleLabel.textColor = .label
+
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

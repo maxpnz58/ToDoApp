@@ -43,6 +43,10 @@
 		35D2A67C2E4CC276004BCF95 /* TaskDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A67A2E4CC276004BCF95 /* TaskDetailViewController.swift */; };
 		35D2A67E2E4CC2B3004BCF95 /* TaskDetailRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A67D2E4CC2B3004BCF95 /* TaskDetailRouter.swift */; };
 		35D2A67F2E4CC2B3004BCF95 /* TaskDetailRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A67D2E4CC2B3004BCF95 /* TaskDetailRouter.swift */; };
+		35D2A6882E4D1B37004BCF95 /* SFProText-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A6862E4D1B37004BCF95 /* SFProText-Bold.ttf */; };
+		35D2A6892E4D1B37004BCF95 /* SFProText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A6872E4D1B37004BCF95 /* SFProText-Regular.ttf */; };
+		35D2A68C2E4D1B7E004BCF95 /* SFProText-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */; };
+		35D2A68D2E4D1B7E004BCF95 /* SFProText-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +94,9 @@
 		35D2A6772E4CC244004BCF95 /* TaskDetailInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailInteractor.swift; sourceTree = "<group>"; };
 		35D2A67A2E4CC276004BCF95 /* TaskDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailViewController.swift; sourceTree = "<group>"; };
 		35D2A67D2E4CC2B3004BCF95 /* TaskDetailRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailRouter.swift; sourceTree = "<group>"; };
+		35D2A6862E4D1B37004BCF95 /* SFProText-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProText-Bold.ttf"; sourceTree = "<group>"; };
+		35D2A6872E4D1B37004BCF95 /* SFProText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProText-Regular.ttf"; sourceTree = "<group>"; };
+		35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProText-Medium.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -165,6 +172,7 @@
 				35D2A6312E4BD205004BCF95 /* Modules */,
 				35D2A60A2E4BB39C004BCF95 /* Assets.xcassets */,
 				35D2A60B2E4BB39C004BCF95 /* Info.plist */,
+				35D2A68A2E4D1B60004BCF95 /* Fonts */,
 				35D2A6362E4BD359004BCF95 /* Extentions */,
 			);
 			path = ToDoTracker;
@@ -265,6 +273,16 @@
 				35D2A67D2E4CC2B3004BCF95 /* TaskDetailRouter.swift */,
 			);
 			path = TaskDetail;
+			sourceTree = "<group>";
+		};
+		35D2A68A2E4D1B60004BCF95 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */,
+				35D2A6862E4D1B37004BCF95 /* SFProText-Bold.ttf */,
+				35D2A6872E4D1B37004BCF95 /* SFProText-Regular.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -387,8 +405,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D2A6882E4D1B37004BCF95 /* SFProText-Bold.ttf in Resources */,
+				35D2A6892E4D1B37004BCF95 /* SFProText-Regular.ttf in Resources */,
 				35D2A6132E4BB39C004BCF95 /* Assets.xcassets in Resources */,
 				35D2A6202E4BB3D7004BCF95 /* LaunchScreen.storyboard in Resources */,
+				35D2A68D2E4D1B7E004BCF95 /* SFProText-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,6 +417,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D2A68C2E4D1B7E004BCF95 /* SFProText-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

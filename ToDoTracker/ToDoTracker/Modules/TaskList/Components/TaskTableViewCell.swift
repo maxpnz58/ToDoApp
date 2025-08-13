@@ -12,17 +12,18 @@ final class TaskTableViewCell: UITableViewCell {
     static let reuseIdentifier = "TaskTableViewCell"
     
     private let completeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "circle"), for: .normal)
-        button.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .selected)
-        button.tintColor = .systemGray
+        let button = UIButton(type: .custom)
+        let circleImage = UIImage(named: "circle")
+        button.setImage(circleImage!.withRenderingMode(.alwaysOriginal), for: .normal)
+        let circleTickImage = UIImage(named: "circle.tick")
+        button.setImage(circleTickImage!.withRenderingMode(.alwaysOriginal), for: .selected)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .semibold)
+        label.font = UIFont(name: "SFProText-Medium", size: 16)
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -30,8 +31,7 @@ final class TaskTableViewCell: UITableViewCell {
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
-        label.textColor = .secondaryLabel
+        label.font = UIFont(name: "SFProText-Regular", size: 12)
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -39,9 +39,9 @@ final class TaskTableViewCell: UITableViewCell {
     
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
-        label.textColor = .secondaryLabel
-        label.numberOfLines = 2
+        label.font = UIFont(name: "SFProText-Regular", size: 12)
+        label.numberOfLines = 1
+        label.alpha = 0.5
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -50,11 +50,13 @@ final class TaskTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
         setupUI()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        selectionStyle = .none
         setupUI()
     }
     
@@ -95,7 +97,7 @@ final class TaskTableViewCell: UITableViewCell {
             // Констрейнты для titleLabel
             titleLabel.leadingAnchor.constraint(equalTo: completeButton.trailingAnchor, constant: 8),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            titleLabel.centerYAnchor.constraint(equalTo: completeButton.centerYAnchor),
             
             // Констрейнты для descriptionLabel
             descriptionLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
@@ -140,14 +142,52 @@ final class TaskTableViewCell: UITableViewCell {
     func configure(title: String, description: String, date: Date, completed: Bool) {
         // Устанавливаем текст titleLabel
         titleLabel.text = title
+        titleLabel.alpha = completed ? 0.5 : 1
         // Применяем зачеркивание
         setStrikethrough(to: titleLabel, isStrikethrough: completed)
         // Устанавливаем descriptionLabel после titleLabel
         descriptionLabel.text = String(repeating: title, count: 10)
+        descriptionLabel.alpha = completed ? 0.5 : 1
         // Устанавливаем дату
-        dateLabel.text = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short)
+        dateLabel.text = date.formattedToDMY()
         // Обновляем UI кнопки
         completeButton.isSelected = completed
-        completeButton.tintColor = completed ? .systemGreen : .systemGray
     }
+}
+
+import SwiftUI
+// Обертка для отображения TaskTableViewCell в SwiftUI Preview
+struct TaskTableViewCellRepresentable: UIViewRepresentable {
+    let completed: Bool
+    
+    func makeUIView(context: Context) -> TaskTableViewCell {
+        let cell = TaskTableViewCell(style: .default, reuseIdentifier: TaskTableViewCell.reuseIdentifier)
+        let sampleDate = Date()
+        cell.configure(
+            title: "Sample Task",
+            description: "This is a sample description for the task.",
+            date: sampleDate,
+            completed: completed
+        )
+        return cell
+    }
+    
+    func updateUIView(_ uiView: TaskTableViewCell, context: Context) {
+        // Обновление не требуется для статического превью
+    }
+}
+
+// SwiftUI Preview
+#Preview("TaskTableViewCell - Not Completed") {
+    TaskTableViewCellRepresentable(completed: false)
+        .frame(width: 350, height: 150) // Устанавливаем размеры для превью
+        .padding()
+        .previewLayout(.sizeThatFits)
+}
+
+#Preview("TaskTableViewCell - Completed") {
+    TaskTableViewCellRepresentable(completed: true)
+        .frame(width: 350, height: 150)
+        .padding()
+        .previewLayout(.sizeThatFits)
 }
