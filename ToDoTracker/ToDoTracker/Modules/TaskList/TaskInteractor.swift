@@ -9,11 +9,16 @@ import Foundation
 import CoreData
 
 final class TasksInteractor: TasksInteractorProtocol {
-    func loadInitialTodos() {
+    func loadInitialTodos(completion: @escaping () -> Void) {
         let imported = UserDefaults.standard.bool(forKey: "imported")
-        guard !imported else { return }
+        guard !imported else {
+            completion()
+            return
+        }
+
         NetworkService.shared.fetchTodos { result in
-            if case .success(let todos) = result {
+            switch result {
+            case .success(let todos):
                 CoreDataStack.shared.performBackground { ctx in
                     for t in todos {
                         let task = TaskEntity(context: ctx)
@@ -24,11 +29,26 @@ final class TasksInteractor: TasksInteractorProtocol {
                         task.userId = Int64(t.userId)
                         task.createdAt = Date()
                     }
-                    UserDefaults.standard.set(true, forKey: "imported")
+                    do {
+                        try ctx.save()
+                        UserDefaults.standard.set(true, forKey: "imported")
+                    } catch {
+                        print("❌ Save error:", error)
+                    }
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
+            case .failure(let error):
+                print("❌ Network error:", error)
+                DispatchQueue.main.async {
+                    completion()
                 }
             }
         }
     }
+
+
 
     func fetchAllTasks(completion: @escaping ([TaskModel]) -> Void) {
         DispatchQueue.global().async {
@@ -53,15 +73,27 @@ final class TasksInteractor: TasksInteractorProtocol {
 
     func updateTask(_ task: TaskModel) {
         CoreDataStack.shared.performBackground { ctx in
+            ctx.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            
             let req: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
             req.predicate = NSPredicate(format: "id == %d", task.id)
-            if let obj = try? ctx.fetch(req).first {
-                obj.title = task.title
-                obj.details = task.details
-                obj.completed = task.completed
+            req.fetchLimit = 1
+            
+            do {
+                if let obj = try ctx.fetch(req).first {
+                    obj.title = task.title
+                    obj.details = task.details
+                    obj.completed = task.completed
+                } else {
+                    print("⚠️ Task with id \(task.id) not found in Core Data")
+                }
+                try ctx.save()
+            } catch {
+                print("❌ Failed to update task:", error)
             }
         }
     }
+
 
     func searchTasks(query: String, completion: @escaping ([TaskModel]) -> Void) {
         DispatchQueue.global().async {

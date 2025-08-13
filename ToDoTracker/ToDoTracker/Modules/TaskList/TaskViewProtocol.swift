@@ -9,6 +9,7 @@ import Foundation
 
 protocol TasksViewProtocol: AnyObject {
     func showTasks(_ tasks: [TaskModel])
+    func updateTask(at index: Int, with task: TaskModel)
 }
 
 protocol TasksPresenterProtocol: AnyObject {
@@ -20,7 +21,7 @@ protocol TasksPresenterProtocol: AnyObject {
 }
 
 protocol TasksInteractorProtocol: AnyObject {
-    func loadInitialTodos()
+    func loadInitialTodos(completion: @escaping () -> Void)
     func fetchAllTasks(completion: @escaping ([TaskModel]) -> Void)
     func createTask(title: String, details: String?)
     func updateTask(_ task: TaskModel)
