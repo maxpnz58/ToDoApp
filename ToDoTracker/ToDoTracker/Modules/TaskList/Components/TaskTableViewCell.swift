@@ -146,7 +146,8 @@ final class TaskTableViewCell: UITableViewCell {
         setStrikethrough(to: titleLabel, isStrikethrough: completed)
         
         // Конфим текст описания задачи
-        descriptionLabel.text = String(repeating: title, count: 10)
+        descriptionLabel.text = (description != "") ? description : "🤷‍♂️ Ой! API has no description text to the tasks! But you can add It yourself 📄✨"
+
         descriptionLabel.alpha = completed ? 0.5 : 1
         
         // Конфим дату создания

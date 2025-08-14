@@ -14,6 +14,8 @@ final class TasksViewController: UIViewController {
     private var filteredTasks: [TaskModel] = []
     private var isSearching = false
     
+    private let topBar = UIView()
+    private let titleLabel = UILabel()
     private let searchBar = UISearchBar()
     private let tableView = UITableView()
     private let bottomBar = UIView()
@@ -23,30 +25,63 @@ final class TasksViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        configureNavigationBar()
+        setupTopBar()
         setupBottomBar()
         setupTableView()
         presenter?.viewDidLoad()
     }
     
-    private func configureNavigationBar() {
-        let titleLabel = UILabel()
+    private func setupTopBar() {
+        // Серый чердак
+        topBar.backgroundColor = .systemBackground
+        topBar.translatesAutoresizingMaskIntoConstraints = false
+
+        // Надпись Задачи:
         titleLabel.text = "Задачи"
         titleLabel.textAlignment = .left
         titleLabel.font = UIFont(name: "SFProText-Bold", size: 32) ?? .systemFont(ofSize: 32, weight: .bold)
         titleLabel.textColor = .label
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
-    }
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // SearchBar
+        searchBar.placeholder = "Search"
+        searchBar.searchTextField.font =  UIFont(name: "SFProText-Regular", size: 18)
+        searchBar.backgroundImage = UIImage()
+        searchBar.delegate = self
+        searchBar.searchBarStyle = .default
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
 
-    func setupTableView() {
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.reuseIdentifier)
+        view.addSubview(topBar)
+        topBar.addSubview(titleLabel)
+        topBar.addSubview(searchBar)
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            topBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            topBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            topBar.topAnchor.constraint(equalTo: view.topAnchor),
+            topBar.bottomAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 16),
+            
+            titleLabel.topAnchor.constraint(equalTo: topBar.topAnchor, constant: 70),
+            titleLabel.leadingAnchor.constraint(equalTo: topBar.leadingAnchor, constant: 20),
+            
+            searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+            searchBar.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor,constant: -8),
+            searchBar.trailingAnchor.constraint(equalTo: topBar.trailingAnchor, constant: -12),
+            searchBar.heightAnchor.constraint(equalToConstant: 40)
+        ])
+    }
+    
+    func setupTableView() {
+        view.addSubview(tableView)
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        tableView.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.reuseIdentifier)
+        tableView.keyboardDismissMode = .onDrag
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: topBar.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor)
@@ -64,7 +99,7 @@ final class TasksViewController: UIViewController {
         countLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Кнопка добавить задачу
-        let circleImage = UIImage(named: "newTaaskIcon")
+        let circleImage = UIImage(named: "newTaskIcon")
         addButton.setImage(circleImage!.withRenderingMode(.alwaysOriginal), for: .normal)
         addButton.contentHorizontalAlignment = .fill
         addButton.contentVerticalAlignment = .fill
@@ -92,7 +127,8 @@ final class TasksViewController: UIViewController {
     }
     
     private func updateCounter() {
-        countLabel.text = "\(tasks.count) Задач"
+        let count = isSearching ? filteredTasks.count : tasks.count
+        countLabel.text = "\(count) Задач"
     }
     
     @objc private func addTaskTapped() {
@@ -114,11 +150,12 @@ final class TasksViewController: UIViewController {
         let indexPath = IndexPath(row: index, section: 0)
         tableView.reloadRows(at: [indexPath], with: .automatic)
     }
-
 }
 
 extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { tasks.count }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        isSearching ? filteredTasks.count : tasks.count
+    }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -129,7 +166,7 @@ extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
             return UITableViewCell()
         }
         
-        let task = tasks[indexPath.row]
+        let task = isSearching ? filteredTasks[indexPath.row] : tasks[indexPath.row]
         
         cell.configure(
             title: task.title,
@@ -138,14 +175,16 @@ extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
             completed: task.completed
         )
         
-        // Обновляем состояние через Presenter
         cell.onToggleComplete = { [weak self] in
             guard let self = self else { return }
-            var updatedTask = self.tasks[indexPath.row]
+            var updatedTask = task
             updatedTask.completed.toggle()
-            self.tasks[indexPath.row] = updatedTask
+            if let idx = self.tasks.firstIndex(where: { $0.id == task.id }) {
+                self.tasks[idx] = updatedTask
+            }
             self.presenter?.didToggleComplete(task: updatedTask)
             tableView.reloadRows(at: [indexPath], with: .automatic)
+            self.updateCounter()
         }
         
         return cell
@@ -180,5 +219,30 @@ extension TasksViewController: TaskDetailDelegate {
             tasks[index] = task
             tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
+    }
+}
+
+extension TasksViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            isSearching = false
+            filteredTasks.removeAll()
+        } else {
+            isSearching = true
+            filteredTasks = tasks.filter {
+                $0.title.lowercased().contains(searchText.lowercased()) ||
+                ($0.details?.lowercased().contains(searchText.lowercased()) ?? false)
+            }
+        }
+        tableView.reloadData()
+        updateCounter()
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        isSearching = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+        tableView.reloadData()
+        updateCounter()
     }
 }

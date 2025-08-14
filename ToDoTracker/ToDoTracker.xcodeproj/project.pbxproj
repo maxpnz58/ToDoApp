@@ -48,6 +48,8 @@
 		35D2A68C2E4D1B7E004BCF95 /* SFProText-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */; };
 		35D2A68D2E4D1B7E004BCF95 /* SFProText-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */; };
 		35D2A68F2E4DD492004BCF95 /* Int64+Extention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A68E2E4DD492004BCF95 /* Int64+Extention.swift */; };
+		35D2A6912E4E348D004BCF95 /* ActionPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A6902E4E348D004BCF95 /* ActionPopupView.swift */; };
+		35D2A6922E4E348D004BCF95 /* ActionPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A6902E4E348D004BCF95 /* ActionPopupView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +101,7 @@
 		35D2A6872E4D1B37004BCF95 /* SFProText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProText-Regular.ttf"; sourceTree = "<group>"; };
 		35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProText-Medium.ttf"; sourceTree = "<group>"; };
 		35D2A68E2E4DD492004BCF95 /* Int64+Extention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int64+Extention.swift"; sourceTree = "<group>"; };
+		35D2A6902E4E348D004BCF95 /* ActionPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionPopupView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -252,6 +255,7 @@
 			isa = PBXGroup;
 			children = (
 				35D2A6622E4BFAF0004BCF95 /* TaskTableViewCell.swift */,
+				35D2A6902E4E348D004BCF95 /* ActionPopupView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -454,6 +458,7 @@
 				35D2A6212E4BB3D7004BCF95 /* AppDelegate.swift in Sources */,
 				35D2A66F2E4CC0A8004BCF95 /* Date+Extentions.swift in Sources */,
 				35D2A6422E4BD53E004BCF95 /* TaskRouter.swift in Sources */,
+				35D2A6922E4E348D004BCF95 /* ActionPopupView.swift in Sources */,
 				35D2A67C2E4CC276004BCF95 /* TaskDetailViewController.swift in Sources */,
 				35D2A63F2E4BD433004BCF95 /* TaskPresenter.swift in Sources */,
 				35D2A6752E4CC232004BCF95 /* TaskDetailPresenter.swift in Sources */,
@@ -479,6 +484,7 @@
 				35D2A67F2E4CC2B3004BCF95 /* TaskDetailRouter.swift in Sources */,
 				35D2A6762E4CC232004BCF95 /* TaskDetailPresenter.swift in Sources */,
 				35D2A6452E4BD551004BCF95 /* TaskViewController.swift in Sources */,
+				35D2A6912E4E348D004BCF95 /* ActionPopupView.swift in Sources */,
 				35D2A6392E4BD399004BCF95 /* TaskViewProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
