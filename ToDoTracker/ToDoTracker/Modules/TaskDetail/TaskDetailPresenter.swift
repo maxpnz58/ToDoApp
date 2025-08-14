@@ -13,6 +13,8 @@ final class TaskDetailPresenter: TaskDetailPresenterProtocol {
     var interactor: TaskDetailInteractorProtocol?
     
     private var task: TaskModel
+    
+    private var isNewTask = false
 
     init(task: TaskModel) {
         self.task = task
@@ -30,5 +32,10 @@ final class TaskDetailPresenter: TaskDetailPresenterProtocol {
     
     func currentTask() -> TaskModel {
         return task
+    }
+    
+    func prepareForNewTask() {
+        task = TaskModel(id: UUID().positiveInt64Value, title: "Заголовок", details: "Описание", createdAt: Date(), completed: false)
+        interactor?.createTask(task)
     }
 }

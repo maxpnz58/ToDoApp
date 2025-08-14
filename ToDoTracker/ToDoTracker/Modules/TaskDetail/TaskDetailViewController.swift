@@ -80,3 +80,17 @@ final class TaskDetailViewController: UIViewController, TaskDetailViewProtocol {
         navigationController?.popViewController(animated: true)
     }
 }
+
+extension TaskDetailViewController {
+    @objc func configureForNewTask() {
+        // Сбрасываем текстовые поля
+        titleField.text = ""
+        descriptionField.text = ""
+        
+        // Настраиваем заголовок навигации
+        navigationItem.title = "New Task"
+        
+        // Сообщаем презентеру, что создаём новую задачу
+        presenter?.prepareForNewTask()
+    }
+}

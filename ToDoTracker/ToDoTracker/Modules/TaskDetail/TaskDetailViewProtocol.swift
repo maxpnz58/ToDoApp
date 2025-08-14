@@ -16,10 +16,12 @@ protocol TaskDetailPresenterProtocol: AnyObject {
     func viewDidLoad()
     func didUpdateTask(title: String, description: String?)
     func currentTask() -> TaskModel
+    func prepareForNewTask()
 }
 
 protocol TaskDetailInteractorProtocol: AnyObject {
     func updateTask(_ task: TaskModel)
+    func createTask(_ task: TaskModel)
 }
 
 protocol TaskDetailRouterProtocol: AnyObject {

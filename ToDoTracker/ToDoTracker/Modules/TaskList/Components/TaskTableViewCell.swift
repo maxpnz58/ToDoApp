@@ -140,17 +140,19 @@ final class TaskTableViewCell: UITableViewCell {
     }
     
     func configure(title: String, description: String, date: Date, completed: Bool) {
-        // Устанавливаем текст titleLabel
+        // Конфим текст заголовка
         titleLabel.text = title
         titleLabel.alpha = completed ? 0.5 : 1
-        // Применяем зачеркивание
         setStrikethrough(to: titleLabel, isStrikethrough: completed)
-        // Устанавливаем descriptionLabel после titleLabel
+        
+        // Конфим текст описания задачи
         descriptionLabel.text = String(repeating: title, count: 10)
         descriptionLabel.alpha = completed ? 0.5 : 1
-        // Устанавливаем дату
+        
+        // Конфим дату создания
         dateLabel.text = date.formattedToDMY()
-        // Обновляем UI кнопки
+        
+        // Конфим UI состояние кнопки
         completeButton.isSelected = completed
     }
 }
@@ -182,12 +184,4 @@ struct TaskTableViewCellRepresentable: UIViewRepresentable {
     TaskTableViewCellRepresentable(completed: false)
         .frame(width: 350, height: 150) // Устанавливаем размеры для превью
         .padding()
-        .previewLayout(.sizeThatFits)
-}
-
-#Preview("TaskTableViewCell - Completed") {
-    TaskTableViewCellRepresentable(completed: true)
-        .frame(width: 350, height: 150)
-        .padding()
-        .previewLayout(.sizeThatFits)
 }
