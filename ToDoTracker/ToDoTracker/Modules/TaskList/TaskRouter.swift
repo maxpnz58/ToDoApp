@@ -21,5 +21,13 @@ final class TasksRouter: TasksRouterProtocol {
 
         return view
     }
+    
+    func navigateToTaskDetail(from view: TasksViewProtocol, with task: TaskModel) {
+        let detailVC = TaskDetailRouter.createModule(with: task)
+        if let viewVC = view as? UIViewController {
+            detailVC.delegate = viewVC as? TaskDetailDelegate
+            viewVC.navigationController?.pushViewController(detailVC, animated: true)
+        }
+    }
 }
 

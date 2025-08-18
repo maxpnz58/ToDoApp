@@ -9,7 +9,7 @@ import Foundation
 
 protocol TaskDetailViewProtocol: AnyObject {
     func showTask(_ task: TaskModel)
-    func showError(_ message: String)
+//    func showError(_ message: String)
 }
 
 protocol TaskDetailPresenterProtocol: AnyObject {

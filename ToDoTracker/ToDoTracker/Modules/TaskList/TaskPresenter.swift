@@ -6,6 +6,7 @@
 //
 
 final class TasksPresenter: TasksPresenterProtocol {
+    
     weak var view: TasksViewProtocol?
     var interactor: TasksInteractorProtocol?
     var router: TasksRouterProtocol?
@@ -25,13 +26,18 @@ final class TasksPresenter: TasksPresenterProtocol {
     }
 
     func didSelectTask(_ task: TaskModel) {
-        // Навигация на детали через router
+        guard let view = view else { return }
+                router?.navigateToTaskDetail(from: view, with: task)
     }
 
-    func didTapAddTask(title: String, details: String?) {
-        interactor?.createTask(title: title, details: details)
-        // После создания получаем задачу из Core Data и добавляем в массив
-        fetchTasks()
+//    func didTapAddTask(title: String, details: String?) {
+////        interactor?.createTask(title: title, details: details)
+//        // После создания получаем задачу из Core Data и добавляем в массив
+//        fetchTasks()
+//    }
+    func didDeleteTask(_ task: TaskModel) {
+        interactor?.deleteTask(byId: task.id)
+        viewDidLoad()
     }
 
     func didToggleComplete(task: TaskModel) {

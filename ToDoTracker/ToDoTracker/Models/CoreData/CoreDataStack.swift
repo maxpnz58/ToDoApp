@@ -30,9 +30,6 @@ final class CoreDataStack {
         
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-        
-        
-
     }
 
     var viewContext: NSManagedObjectContext { container.viewContext }

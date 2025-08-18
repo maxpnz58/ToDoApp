@@ -48,8 +48,6 @@ final class TasksInteractor: TasksInteractorProtocol {
         }
     }
 
-
-
     func fetchAllTasks(completion: @escaping ([TaskModel]) -> Void) {
         DispatchQueue.global().async {
             let req: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
@@ -57,17 +55,6 @@ final class TasksInteractor: TasksInteractorProtocol {
             let results = (try? CoreDataStack.shared.viewContext.fetch(req)) ?? []
             let models = results.map { TaskModel(entity: $0) }
             DispatchQueue.main.async { completion(models) }
-        }
-    }
-
-    func createTask(title: String, details: String?) {
-        CoreDataStack.shared.performBackground { ctx in
-            let t = TaskEntity(context: ctx)
-            t.id = Int64(Date().timeIntervalSince1970)
-            t.title = title
-            t.details = details
-            t.createdAt = Date()
-            t.completed = false
         }
     }
 
@@ -90,6 +77,28 @@ final class TasksInteractor: TasksInteractorProtocol {
                 try ctx.save()
             } catch {
                 print("❌ Failed to update task:", error)
+            }
+        }
+    }
+    
+    func deleteTask(byId taskId: Int64) {
+        CoreDataStack.shared.performBackground { ctx in
+            ctx.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            
+            let fetchRequest: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %d", taskId)
+            fetchRequest.fetchLimit = 1
+            
+            do {
+                if let taskToDelete = try ctx.fetch(fetchRequest).first {
+                    ctx.delete(taskToDelete)
+                    try ctx.save()
+                    print("✅ Task with id \(taskId) deleted successfully")
+                } else {
+                    print("⚠️ Task with id \(taskId) not found in Core Data")
+                }
+            } catch {
+                print("❌ Failed to delete task with id \(taskId):", error)
             }
         }
     }

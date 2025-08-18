@@ -147,7 +147,6 @@ final class TaskTableViewCell: UITableViewCell {
         
         // Конфим текст описания задачи
         descriptionLabel.text = (description != "") ? description : "🤷‍♂️ Ой! API has no description text to the tasks! But you can add It yourself 📄✨"
-
         descriptionLabel.alpha = completed ? 0.5 : 1
         
         // Конфим дату создания
@@ -161,6 +160,8 @@ final class TaskTableViewCell: UITableViewCell {
 import SwiftUI
 // Обертка для отображения TaskTableViewCell в SwiftUI Preview
 struct TaskTableViewCellRepresentable: UIViewRepresentable {
+    func updateUIView(_ uiView: TaskTableViewCell, context: Context) {}
+    
     let completed: Bool
     
     func makeUIView(context: Context) -> TaskTableViewCell {
@@ -173,10 +174,6 @@ struct TaskTableViewCellRepresentable: UIViewRepresentable {
             completed: completed
         )
         return cell
-    }
-    
-    func updateUIView(_ uiView: TaskTableViewCell, context: Context) {
-        // Обновление не требуется для статического превью
     }
 }
 

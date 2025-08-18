@@ -192,9 +192,7 @@ extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let task = tasks[indexPath.row]
-        let detailVC = TaskDetailRouter.createModule(with: task)
-        detailVC.delegate = self
-        navigationController?.pushViewController(detailVC, animated: true)
+        presenter?.didSelectTask(task)
     }
 }
 
@@ -222,6 +220,38 @@ extension TasksViewController: TaskDetailDelegate {
     }
 }
 
+extension TasksViewController {
+    // Метод вызывает контекстное меню при длительном нажатии на ячейку
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let task = tasks[indexPath.row]
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ -> UIMenu? in
+            guard let self = self else { return nil }
+
+            let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
+                self.presenter?.didSelectTask(task)
+            }
+
+            let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+                print("Поделиться \(task.title)")
+            }
+
+            let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
+                print("Удалить \(task.title)")
+                self.presenter?.didDeleteTask(task)
+            }
+
+            return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
+        }
+    }
+    
+    // Для визуального выделения ячейки при долгом нажатии
+    func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
+        animator.addCompletion {
+        }
+    }
+}
+
 extension TasksViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
@@ -244,5 +274,16 @@ extension TasksViewController: UISearchBarDelegate {
         searchBar.resignFirstResponder()
         tableView.reloadData()
         updateCounter()
+    }
+    
+    func deleteTask(at index: Int) {
+        // Анимированное удаление
+        tableView.performBatchUpdates({
+            // 1. Удалить из данных
+            tasks.remove(at: index)
+            
+            // 2. Удалить ячейку
+            tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .left)
+        }, completion: nil)
     }
 }
