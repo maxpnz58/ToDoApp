@@ -139,7 +139,7 @@ final class TaskTableViewCell: UITableViewCell {
         label.attributedText = attributedString
     }
     
-    func configure(title: String, description: String, date: Date, completed: Bool) {
+    func configure(title: String, description: String, date: String, completed: Bool) {
         // Конфим текст заголовка
         titleLabel.text = title
         titleLabel.alpha = completed ? 0.5 : 1
@@ -150,7 +150,7 @@ final class TaskTableViewCell: UITableViewCell {
         descriptionLabel.alpha = completed ? 0.5 : 1
         
         // Конфим дату создания
-        dateLabel.text = date.formattedToDMY()
+        dateLabel.text = date
         
         // Конфим UI состояние кнопки
         completeButton.isSelected = completed
@@ -166,7 +166,7 @@ struct TaskTableViewCellRepresentable: UIViewRepresentable {
     
     func makeUIView(context: Context) -> TaskTableViewCell {
         let cell = TaskTableViewCell(style: .default, reuseIdentifier: TaskTableViewCell.reuseIdentifier)
-        let sampleDate = Date()
+        let sampleDate = Date().formattedToDMY()
         cell.configure(
             title: "Sample Task",
             description: "This is a sample description for the task.",

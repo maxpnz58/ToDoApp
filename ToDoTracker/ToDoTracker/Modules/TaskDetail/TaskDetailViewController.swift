@@ -7,11 +7,8 @@
 
 import UIKit
 
-final class TaskDetailViewController: UIViewController, TaskDetailViewProtocol {
+final class TaskDetailViewController: UIViewController {
 
-    
-    weak var delegate: TaskDetailDelegate?
-    
     var presenter: TaskDetailPresenterProtocol?
 
     private let titleField = UITextField()
@@ -26,14 +23,14 @@ final class TaskDetailViewController: UIViewController, TaskDetailViewProtocol {
     }
 
     private func setupUI() {
-        //  Название задачи:
+        // Название задачи:
         titleField.borderStyle = .none
         titleField.placeholder = "Название задачи"
         titleField.textAlignment = .left
         titleField.font = UIFont(name: "SFProText-Bold", size: 32)
         titleField.translatesAutoresizingMaskIntoConstraints = false
         
-        //Дата создания задачи
+        // Дата создания задачи
         dateLabel.font = UIFont(name: "SFProText-Regular", size: 12)
         dateLabel.numberOfLines = 1
         dateLabel.alpha = 0.5
@@ -43,7 +40,6 @@ final class TaskDetailViewController: UIViewController, TaskDetailViewProtocol {
         descriptionField.font = UIFont(name: "SFProText-Regular", size: 16)
         descriptionField.translatesAutoresizingMaskIntoConstraints = false
         
-
         view.addSubview(titleField)
         view.addSubview(dateLabel)
         view.addSubview(descriptionField)
@@ -62,45 +58,44 @@ final class TaskDetailViewController: UIViewController, TaskDetailViewProtocol {
             descriptionField.trailingAnchor.constraint(equalTo: titleField.trailingAnchor),
             descriptionField.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20)
         ])
-    }
-
-    func showTask(_ task: TaskModel) {
-        titleField.text = task.title
-        descriptionField.text = task.details
-        dateLabel.text = task.createdAt.formattedToDMY()
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Сохранить", style: .done, target: self, action: #selector(saveTask))
     }
 
     @objc private func saveTask() {
         let title = titleField.text ?? ""
         let description = descriptionField.text
-        presenter?.didUpdateTask(title: title, description: description)
-        
-        // Уведомляем делегата что что - то поменялось и нужно перерисовать ui
-        if let updatedTask = presenter?.currentTask() {
-            delegate?.taskDidUpdate(updatedTask)
+        presenter?.didUpdateTask(title: title, description: description) { [weak self] result in
+            switch result {
+            case .success:
+                self?.navigationController?.popViewController(animated: true)
+            case .failure(let error):
+                self?.showError(message: error.localizedDescription)
+            }
         }
-        navigationController?.popViewController(animated: true)
     }
-}
-
-extension TaskDetailViewController {
-    @objc func configureForNewTask() {
-        // Сбрасываем текстовые поля
+    
+    func configureForNewTask() {
         titleField.text = ""
-        dateLabel.text = ""
         descriptionField.text = ""
-        // Сообщаем презентеру, что создаём новую задачу
-        presenter?.prepareForNewTask()
+        setDate(Date().formattedToDMY())
     }
 }
 
-// Автосохранение заметки при выходе из VC
-extension TaskDetailViewController {
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if self.isMovingFromParent || self.isBeingDismissed {
-            saveTask()
-        }
+extension TaskDetailViewController: TaskDetailViewProtocol {
+    func showTask(_ viewModel: TaskViewModel) {
+        titleField.text = viewModel.title
+        descriptionField.text = viewModel.description
+        dateLabel.text = viewModel.dateString
+    }
+    
+    func setDate(_ dateString: String) {
+        dateLabel.text = dateString
+    }
+    
+    func showError(message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }

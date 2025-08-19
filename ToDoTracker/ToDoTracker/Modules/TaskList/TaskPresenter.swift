@@ -5,54 +5,100 @@
 //  Created by Max on 12.08.2025.
 //
 
+import UIKit
+
 final class TasksPresenter: TasksPresenterProtocol {
     
     weak var view: TasksViewProtocol?
     var interactor: TasksInteractorProtocol?
     var router: TasksRouterProtocol?
-
+    
     private var tasks: [TaskModel] = []
+    private var currentQuery: String = ""
 
     func viewDidLoad() {
-        interactor?.loadInitialTodos { [weak self] in
-            self?.fetchTasks()
+        interactor?.loadInitialTodos { [weak self] result in
+            if case .failure(let error) = result {
+                self?.view?.showError(message: error.localizedDescription)
+            }
+            self?.search(query: "")
         }
     }
-
-    private func fetchTasks() {
-        interactor?.fetchAllTasks { [weak self] tasks in
-            self?.view?.showTasks(tasks)
-        }
+    
+    func viewWillAppear() {
+        search(query: currentQuery)
     }
 
-    func didSelectTask(_ task: TaskModel) {
+    func didSelectTask(id: Int64) {
         guard let view = view else { return }
-                router?.navigateToTaskDetail(from: view, with: task)
+        router?.navigateToTaskDetail(from: view, with: id)
+    }
+    
+    func didTapAddTask() {
+        guard let view = view else { return }
+        router?.navigateToNewTaskDetail(from: view)
     }
 
-//    func didTapAddTask(title: String, details: String?) {
-////        interactor?.createTask(title: title, details: details)
-//        // После создания получаем задачу из Core Data и добавляем в массив
-//        fetchTasks()
-//    }
-    func didDeleteTask(_ task: TaskModel) {
-        interactor?.deleteTask(byId: task.id)
-        viewDidLoad()
+    func didDeleteTask(id: Int64) {
+        guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
+        let oldTask = tasks[index]
+        tasks.remove(at: index)
+        view?.deleteTask(withId: id)
+        interactor?.deleteTask(byId: id) { [weak self] result in
+            if case .failure(let error) = result {
+                self?.tasks.insert(oldTask, at: index)
+                self?.view?.insertTask(with: TaskViewModel(from: oldTask), at: index)
+                self?.view?.showError(message: error.localizedDescription)
+            }
+        }
     }
 
-    func didToggleComplete(task: TaskModel) {
-        interactor?.updateTask(task)
-        // Обновляем локально массив
-        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-            tasks[index] = task
-            view?.updateTask(at: index, with: task)
+    func didToggleComplete(id: Int64) {
+        guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
+        let oldTask = tasks[index]
+        var newTask = oldTask
+        newTask.completed.toggle()
+        tasks[index] = newTask
+        view?.updateTask(withId: id, viewModel: TaskViewModel(from: newTask))
+        interactor?.updateTask(newTask) { [weak self] result in
+            if case .failure(let error) = result {
+                self?.tasks[index] = oldTask
+                self?.view?.updateTask(withId: id, viewModel: TaskViewModel(from: oldTask))
+                self?.view?.showError(message: error.localizedDescription)
+            }
         }
     }
 
     func search(query: String) {
-        interactor?.searchTasks(query: query) { [weak self] tasks in
-            self?.tasks = tasks
-            self?.view?.showTasks(tasks)
+        currentQuery = query
+        let fetchCompletion: (Result<[TaskModel], Error>) -> Void = { [weak self] result in
+            switch result {
+            case .success(let fetchedTasks):
+                self?.tasks = fetchedTasks
+                let viewModels = fetchedTasks.map { TaskViewModel(from: $0) }
+                self?.view?.showTasks(viewModels)
+            case .failure(let error):
+                self?.view?.showError(message: error.localizedDescription)
+            }
+        }
+        if query.isEmpty {
+            interactor?.fetchAllTasks(completion: fetchCompletion)
+        } else {
+            interactor?.searchTasks(query: query, completion: fetchCompletion)
+        }
+    }
+}
+
+extension TasksPresenter: TaskDetailDelegate {
+    func didCreateTask(_ task: TaskModel) {
+        tasks.insert(task, at: 0) // или куда нужно
+        view?.insertTask(with: TaskViewModel(from: task), at: 0)
+    }
+
+    func didUpdateTask(_ task: TaskModel) {
+        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+            tasks[index] = task
+            view?.updateTask(withId: task.id, viewModel: TaskViewModel(from: task))
         }
     }
 }

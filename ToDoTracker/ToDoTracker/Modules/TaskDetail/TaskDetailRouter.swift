@@ -19,5 +19,18 @@ final class TaskDetailRouter: TaskDetailRouterProtocol {
 
         return view
     }
-}
+    
+    static func createModuleForNewTask() -> TaskDetailViewController {
+        let view = TaskDetailViewController()
+        let presenter = TaskDetailPresenter(task: nil)
+        let interactor = TaskDetailInteractor()
 
+        view.presenter = presenter
+        presenter.view = view
+        presenter.interactor = interactor
+        
+        view.configureForNewTask()
+
+        return view
+    }
+}

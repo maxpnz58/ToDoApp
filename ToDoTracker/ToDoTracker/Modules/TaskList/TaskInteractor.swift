@@ -9,10 +9,10 @@ import Foundation
 import CoreData
 
 final class TasksInteractor: TasksInteractorProtocol {
-    func loadInitialTodos(completion: @escaping () -> Void) {
+    func loadInitialTodos(completion: @escaping (Result<Void, Error>) -> Void) {
         let imported = UserDefaults.standard.bool(forKey: "imported")
         guard !imported else {
-            completion()
+            completion(.success(()))
             return
         }
 
@@ -32,33 +32,38 @@ final class TasksInteractor: TasksInteractorProtocol {
                     do {
                         try ctx.save()
                         UserDefaults.standard.set(true, forKey: "imported")
+                        DispatchQueue.main.async {
+                            completion(.success(()))
+                        }
                     } catch {
-                        print("❌ Save error:", error)
-                    }
-                    DispatchQueue.main.async {
-                        completion()
+                        DispatchQueue.main.async {
+                            completion(.failure(error))
+                        }
                     }
                 }
             case .failure(let error):
-                print("❌ Network error:", error)
                 DispatchQueue.main.async {
-                    completion()
+                    completion(.failure(error))
                 }
             }
         }
     }
 
-    func fetchAllTasks(completion: @escaping ([TaskModel]) -> Void) {
+    func fetchAllTasks(completion: @escaping (Result<[TaskModel], Error>) -> Void) {
         DispatchQueue.global().async {
             let req: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
             req.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-            let results = (try? CoreDataStack.shared.viewContext.fetch(req)) ?? []
-            let models = results.map { TaskModel(entity: $0) }
-            DispatchQueue.main.async { completion(models) }
+            do {
+                let results = try CoreDataStack.shared.viewContext.fetch(req)
+                let models = results.map { TaskModel(entity: $0) }
+                DispatchQueue.main.async { completion(.success(models)) }
+            } catch {
+                DispatchQueue.main.async { completion(.failure(error)) }
+            }
         }
     }
 
-    func updateTask(_ task: TaskModel) {
+    func updateTask(_ task: TaskModel, completion: @escaping (Result<Void, Error>) -> Void) {
         CoreDataStack.shared.performBackground { ctx in
             ctx.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
@@ -72,16 +77,17 @@ final class TasksInteractor: TasksInteractorProtocol {
                     obj.details = task.details
                     obj.completed = task.completed
                 } else {
-                    print("⚠️ Task with id \(task.id) not found in Core Data")
+                    throw NSError(domain: "Task not found", code: 404)
                 }
                 try ctx.save()
+                DispatchQueue.main.async { completion(.success(())) }
             } catch {
-                print("❌ Failed to update task:", error)
+                DispatchQueue.main.async { completion(.failure(error)) }
             }
         }
     }
     
-    func deleteTask(byId taskId: Int64) {
+    func deleteTask(byId taskId: Int64, completion: @escaping (Result<Void, Error>) -> Void) {
         CoreDataStack.shared.performBackground { ctx in
             ctx.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
@@ -89,29 +95,34 @@ final class TasksInteractor: TasksInteractorProtocol {
             fetchRequest.predicate = NSPredicate(format: "id == %d", taskId)
             fetchRequest.fetchLimit = 1
             
+            print("Trying to delete task withId: \(taskId)")
+            
             do {
                 if let taskToDelete = try ctx.fetch(fetchRequest).first {
                     ctx.delete(taskToDelete)
                     try ctx.save()
-                    print("✅ Task with id \(taskId) deleted successfully")
+                    DispatchQueue.main.async { completion(.success(())) }
                 } else {
-                    print("⚠️ Task with id \(taskId) not found in Core Data")
+                    throw NSError(domain: "Task not found", code: 404)
                 }
             } catch {
-                print("❌ Failed to delete task with id \(taskId):", error)
+                DispatchQueue.main.async { completion(.failure(error)) }
             }
         }
     }
 
-
-    func searchTasks(query: String, completion: @escaping ([TaskModel]) -> Void) {
+    func searchTasks(query: String, completion: @escaping (Result<[TaskModel], Error>) -> Void) {
         DispatchQueue.global().async {
             let req: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
             req.predicate = NSPredicate(format: "title CONTAINS[cd] %@ OR details CONTAINS[cd] %@", query, query)
-            let results = (try? CoreDataStack.shared.viewContext.fetch(req)) ?? []
-            let models = results.map { TaskModel(entity: $0) }
-            DispatchQueue.main.async { completion(models) }
+            req.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+            do {
+                let results = try CoreDataStack.shared.viewContext.fetch(req)
+                let models = results.map { TaskModel(entity: $0) }
+                DispatchQueue.main.async { completion(.success(models)) }
+            } catch {
+                DispatchQueue.main.async { completion(.failure(error)) }
+            }
         }
     }
 }
-

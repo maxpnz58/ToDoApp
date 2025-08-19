@@ -10,9 +10,6 @@ import UIKit
 final class TasksViewController: UIViewController {
 
     var presenter: TasksPresenterProtocol?
-    private var tasks: [TaskModel] = []
-    private var filteredTasks: [TaskModel] = []
-    private var isSearching = false
     
     private let topBar = UIView()
     private let titleLabel = UILabel()
@@ -21,6 +18,11 @@ final class TasksViewController: UIViewController {
     private let bottomBar = UIView()
     private let addButton = UIButton(type: .system)
     private let countLabel = UILabel()
+    
+    private var dataSource: UITableViewDiffableDataSource<Section, TaskViewModel>!
+    private enum Section: Hashable {
+        case main
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,21 +33,23 @@ final class TasksViewController: UIViewController {
         presenter?.viewDidLoad()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        presenter?.viewWillAppear()
+    }
+    
     private func setupTopBar() {
-        // Серый чердак
         topBar.backgroundColor = .systemBackground
         topBar.translatesAutoresizingMaskIntoConstraints = false
 
-        // Надпись Задачи:
         titleLabel.text = "Задачи"
         titleLabel.textAlignment = .left
         titleLabel.font = UIFont(name: "SFProText-Bold", size: 32) ?? .systemFont(ofSize: 32, weight: .bold)
         titleLabel.textColor = .label
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // SearchBar
         searchBar.placeholder = "Search"
-        searchBar.searchTextField.font =  UIFont(name: "SFProText-Regular", size: 18)
+        searchBar.searchTextField.font = UIFont(name: "SFProText-Regular", size: 18)
         searchBar.backgroundImage = UIImage()
         searchBar.delegate = self
         searchBar.searchBarStyle = .default
@@ -71,14 +75,35 @@ final class TasksViewController: UIViewController {
         ])
     }
     
-    func setupTableView() {
+    private func setupTableView() {
         view.addSubview(tableView)
-        tableView.dataSource = self
         tableView.delegate = self
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         tableView.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.reuseIdentifier)
         tableView.keyboardDismissMode = .onDrag
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        dataSource = UITableViewDiffableDataSource<Section, TaskViewModel>(tableView: tableView) { tableView, indexPath, viewModel in
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: TaskTableViewCell.reuseIdentifier,
+                for: indexPath
+            ) as? TaskTableViewCell else {
+                return UITableViewCell()
+            }
+            
+            cell.configure(
+                title: viewModel.title,
+                description: viewModel.description,
+                date: viewModel.dateString,
+                completed: viewModel.completed
+            )
+            
+            cell.onToggleComplete = { [weak self] in
+                self?.presenter?.didToggleComplete(id: viewModel.id)
+            }
+            
+            return cell
+        }
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: topBar.bottomAnchor),
@@ -89,18 +114,15 @@ final class TasksViewController: UIViewController {
     }
     
     private func setupBottomBar() {
-        // Серый подвал
         bottomBar.backgroundColor = .systemGray5
         bottomBar.translatesAutoresizingMaskIntoConstraints = false
         
-        // Счётчик задач по центру
         countLabel.font = UIFont(name: "SFProText-Regular", size: 12)
         countLabel.textAlignment = .center
         countLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Кнопка добавить задачу
         let circleImage = UIImage(named: "newTaskIcon")
-        addButton.setImage(circleImage!.withRenderingMode(.alwaysOriginal), for: .normal)
+        addButton.setImage(circleImage?.withRenderingMode(.alwaysOriginal), for: .normal)
         addButton.contentHorizontalAlignment = .fill
         addButton.contentVerticalAlignment = .fill
         addButton.addTarget(self, action: #selector(addTaskTapped), for: .touchUpInside)
@@ -127,163 +149,104 @@ final class TasksViewController: UIViewController {
     }
     
     private func updateCounter() {
-        let count = isSearching ? filteredTasks.count : tasks.count
+        let count = dataSource.snapshot().numberOfItems
         countLabel.text = "\(count) Задач"
     }
     
     @objc private func addTaskTapped() {
-        let detailVC = TaskDetailViewController()
-        detailVC.configureForNewTask()
-        navigationController?.pushViewController(detailVC, animated: true)
-    }
-    
-    private func toggleTaskCompletion(taskID: Int) {
-        guard let index = tasks.firstIndex(where: { $0.id == taskID }) else { return }
-        
-        // Обновляем модель в массиве
-        tasks[index].completed.toggle()
-        
-        // Отправляем в Core Data через Presenter
-        presenter?.didToggleComplete(task: tasks[index])
-        
-        // Обновляем UI только для изменённой строки
-        let indexPath = IndexPath(row: index, section: 0)
-        tableView.reloadRows(at: [indexPath], with: .automatic)
+        presenter?.didTapAddTask()
     }
 }
 
-extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        isSearching ? filteredTasks.count : tasks.count
-    }
-    
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: TaskTableViewCell.reuseIdentifier,
-            for: indexPath
-        ) as? TaskTableViewCell else {
-            return UITableViewCell()
-        }
-        
-        let task = isSearching ? filteredTasks[indexPath.row] : tasks[indexPath.row]
-        
-        cell.configure(
-            title: task.title,
-            description: task.details ?? "Описание задачи отсутствует",
-            date: task.createdAt,
-            completed: task.completed
-        )
-        
-        cell.onToggleComplete = { [weak self] in
-            guard let self = self else { return }
-            var updatedTask = task
-            updatedTask.completed.toggle()
-            if let idx = self.tasks.firstIndex(where: { $0.id == task.id }) {
-                self.tasks[idx] = updatedTask
-            }
-            self.presenter?.didToggleComplete(task: updatedTask)
-            tableView.reloadRows(at: [indexPath], with: .automatic)
-            self.updateCounter()
-        }
-        
-        return cell
-    }
-    
+extension TasksViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let task = tasks[indexPath.row]
-        presenter?.didSelectTask(task)
+        guard let viewModel = dataSource.itemIdentifier(for: indexPath) else { return }
+        presenter?.didSelectTask(id: viewModel.id)
     }
-}
-
-extension TasksViewController: TasksViewProtocol {
-    func showTasks(_ tasks: [TaskModel]) {
-        self.tasks = tasks
-        tableView.reloadData()
-        updateCounter()
-    }
-
-    func updateTask(at index: Int, with task: TaskModel) {
-        guard index < tasks.count else { return }
-        tasks[index] = task
-        let indexPath = IndexPath(row: index, section: 0)
-        tableView.reloadRows(at: [indexPath], with: .automatic)
-    }
-}
-
-extension TasksViewController: TaskDetailDelegate {
-    func taskDidUpdate(_ task: TaskModel) {
-        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-            tasks[index] = task
-            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
-        }
-    }
-}
-
-extension TasksViewController {
-    // Метод вызывает контекстное меню при длительном нажатии на ячейку
+    
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        let task = tasks[indexPath.row]
+        guard let viewModel = dataSource.itemIdentifier(for: indexPath) else { return nil }
         
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ -> UIMenu? in
             guard let self = self else { return nil }
 
             let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { _ in
-                self.presenter?.didSelectTask(task)
+                self.presenter?.didSelectTask(id: viewModel.id)
             }
 
             let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-                print("Поделиться \(task.title)")
+                print("Поделиться \(viewModel.title)")
             }
 
             let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
-                print("Удалить \(task.title)")
-                self.presenter?.didDeleteTask(task)
+                print("Удалить \(viewModel.title)")
+                self.presenter?.didDeleteTask(id: viewModel.id)
             }
 
             return UIMenu(title: "", children: [editAction, shareAction, deleteAction])
         }
     }
     
-    // Для визуального выделения ячейки при долгом нажатии
     func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
-        animator.addCompletion {
+        animator.addCompletion { }
+    }
+}
+
+extension TasksViewController: TasksViewProtocol {
+    func showTasks(_ viewModels: [TaskViewModel]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, TaskViewModel>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(viewModels)
+        dataSource.apply(snapshot, animatingDifferences: false)
+        updateCounter()
+    }
+    
+    func updateTask(withId id: Int64, viewModel: TaskViewModel) {
+        var snapshot = dataSource.snapshot()
+        if snapshot.itemIdentifiers.contains(where: { $0.id == id }) {
+            snapshot.reloadItems([viewModel])
+            dataSource.apply(snapshot, animatingDifferences: false)
         }
+        updateCounter()
+    }
+    
+    func deleteTask(withId id: Int64) {
+        var snapshot = dataSource.snapshot()
+        if let item = snapshot.itemIdentifiers.first(where: { $0.id == id }) {
+            snapshot.deleteItems([item])
+            dataSource.apply(snapshot)
+        }
+        updateCounter()
+    }
+    
+    func insertTask(with viewModel: TaskViewModel, at index: Int) {
+        var snapshot = dataSource.snapshot()
+        let items = snapshot.itemIdentifiers(inSection: .main)
+        if index < items.count {
+            let referenceItem = items[index]
+            snapshot.insertItems([viewModel], beforeItem: referenceItem)
+        } else {
+            snapshot.appendItems([viewModel])
+        }
+        dataSource.apply(snapshot)
+        updateCounter()
+    }
+    
+    func showError(message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 
 extension TasksViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText.isEmpty {
-            isSearching = false
-            filteredTasks.removeAll()
-        } else {
-            isSearching = true
-            filteredTasks = tasks.filter {
-                $0.title.lowercased().contains(searchText.lowercased()) ||
-                ($0.details?.lowercased().contains(searchText.lowercased()) ?? false)
-            }
-        }
-        tableView.reloadData()
-        updateCounter()
+        presenter?.search(query: searchText)
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        isSearching = false
         searchBar.text = ""
         searchBar.resignFirstResponder()
-        tableView.reloadData()
-        updateCounter()
-    }
-    
-    func deleteTask(at index: Int) {
-        // Анимированное удаление
-        tableView.performBatchUpdates({
-            // 1. Удалить из данных
-            tasks.remove(at: index)
-            
-            // 2. Удалить ячейку
-            tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .left)
-        }, completion: nil)
+        presenter?.search(query: "")
     }
 }
