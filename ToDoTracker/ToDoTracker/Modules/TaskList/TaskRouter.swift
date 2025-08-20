@@ -35,6 +35,21 @@ final class TasksRouter: TasksRouterProtocol {
             viewVC.navigationController?.pushViewController(detailVC, animated: true)
         }
     }
+    
+    func presentShare(from view: TasksViewProtocol, text: String) {
+        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+
+        // Для iPad (чтобы не падало)
+        if let popover = activityVC.popoverPresentationController {
+            if let vc = view as? UIViewController {
+                popover.sourceView = vc.view
+                popover.sourceRect = CGRect(x: vc.view.bounds.midX, y: vc.view.bounds.midY, width: 0, height: 0)
+                popover.permittedArrowDirections = []
+            }
+        }
+
+        (view as? UIViewController)?.present(activityVC, animated: true)
+    }
 }
 
 

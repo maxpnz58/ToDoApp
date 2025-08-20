@@ -55,7 +55,7 @@ final class TasksPresenter: TasksPresenterProtocol {
     }
 
     func didToggleComplete(id: Int64) {
-        guard var vm = taskViewModels.first(where: { $0.id == id }) else { return }
+        guard let vm = taskViewModels.first(where: { $0.id == id }) else { return }
         let oldCompleted = vm.completed
         vm.completed.toggle()
         view?.reloadTask(withId: id)
@@ -84,6 +84,18 @@ final class TasksPresenter: TasksPresenterProtocol {
             interactor?.fetchAllTasks(completion: fetchCompletion)
         } else {
             interactor?.searchTasks(query: query, completion: fetchCompletion)
+        }
+    }
+    
+    func didShareTask(_ task: TaskViewModel) {
+        let textToShare = """
+        📌 Задача: \(task.title)
+        📝 Описание: \(task.description == "" ? "отсутствует" : task.description)
+        ⏰ Дата: \(task.dateString)
+        ✅ Выполнена: \(task.completed ? "Да" : "Нет")
+        """
+        if let view = view {
+            router?.presentShare(from: view, text: textToShare)
         }
     }
 }

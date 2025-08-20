@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3542F3F72E53005C00127EEF /* UITextView+Extention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3542F3F62E53005C00127EEF /* UITextView+Extention.swift */; };
-		3542F3F92E53336500127EEF /* UIViewController+Extention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3542F3F82E53336500127EEF /* UIViewController+Extention.swift */; };
 		355278CA2E55323D00416BB4 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355278C92E55323D00416BB4 /* TaskEntity.swift */; };
 		355278CB2E55323D00416BB4 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355278C92E55323D00416BB4 /* TaskEntity.swift */; };
 		35D2A6132E4BB39C004BCF95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A60A2E4BB39C004BCF95 /* Assets.xcassets */; };
@@ -51,7 +49,6 @@
 		35D2A6892E4D1B37004BCF95 /* SFProText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A6872E4D1B37004BCF95 /* SFProText-Regular.ttf */; };
 		35D2A68C2E4D1B7E004BCF95 /* SFProText-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */; };
 		35D2A68D2E4D1B7E004BCF95 /* SFProText-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */; };
-		35D2A68F2E4DD492004BCF95 /* Int64+Extention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A68E2E4DD492004BCF95 /* Int64+Extention.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,8 +69,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3542F3F62E53005C00127EEF /* UITextView+Extention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extention.swift"; sourceTree = "<group>"; };
-		3542F3F82E53336500127EEF /* UIViewController+Extention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extention.swift"; sourceTree = "<group>"; };
 		355278C92E55323D00416BB4 /* TaskEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEntity.swift; sourceTree = "<group>"; };
 		35D2A5D22E4BA93C004BCF95 /* ToDoTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		35D2A5EB2E4BA940004BCF95 /* ToDoTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDoTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -105,7 +100,6 @@
 		35D2A6862E4D1B37004BCF95 /* SFProText-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProText-Bold.ttf"; sourceTree = "<group>"; };
 		35D2A6872E4D1B37004BCF95 /* SFProText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProText-Regular.ttf"; sourceTree = "<group>"; };
 		35D2A68B2E4D1B7E004BCF95 /* SFProText-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFProText-Medium.ttf"; sourceTree = "<group>"; };
-		35D2A68E2E4DD492004BCF95 /* Int64+Extention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int64+Extention.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -245,9 +239,6 @@
 			isa = PBXGroup;
 			children = (
 				35D2A66E2E4CC0A8004BCF95 /* Date+Extentions.swift */,
-				35D2A68E2E4DD492004BCF95 /* Int64+Extention.swift */,
-				3542F3F62E53005C00127EEF /* UITextView+Extention.swift */,
-				3542F3F82E53336500127EEF /* UIViewController+Extention.swift */,
 			);
 			path = Extentions;
 			sourceTree = "<group>";
@@ -444,7 +435,6 @@
 				35D2A6632E4BFAF0004BCF95 /* TaskTableViewCell.swift in Sources */,
 				35D2A6782E4CC244004BCF95 /* TaskDetailInteractor.swift in Sources */,
 				35D2A65F2E4BF8F0004BCF95 /* TaskEntity+CoreDataClass.swift in Sources */,
-				3542F3F72E53005C00127EEF /* UITextView+Extention.swift in Sources */,
 				35D2A6602E4BF8F0004BCF95 /* TaskEntity+CoreDataProperties.swift in Sources */,
 				35D2A6722E4CC1E1004BCF95 /* TaskDetailViewProtocols.swift in Sources */,
 				35D2A6442E4BD551004BCF95 /* TaskViewController.swift in Sources */,
@@ -452,13 +442,11 @@
 				35D2A6382E4BD399004BCF95 /* TaskViewProtocols.swift in Sources */,
 				35D2A67E2E4CC2B3004BCF95 /* TaskDetailRouter.swift in Sources */,
 				35D2A63C2E4BD417004BCF95 /* TaskInteractor.swift in Sources */,
-				35D2A68F2E4DD492004BCF95 /* Int64+Extention.swift in Sources */,
 				35D2A6212E4BB3D7004BCF95 /* AppDelegate.swift in Sources */,
 				35D2A66F2E4CC0A8004BCF95 /* Date+Extentions.swift in Sources */,
 				35D2A6422E4BD53E004BCF95 /* TaskRouter.swift in Sources */,
 				35D2A67C2E4CC276004BCF95 /* TaskDetailViewController.swift in Sources */,
 				355278CA2E55323D00416BB4 /* TaskEntity.swift in Sources */,
-				3542F3F92E53336500127EEF /* UIViewController+Extention.swift in Sources */,
 				35D2A63F2E4BD433004BCF95 /* TaskPresenter.swift in Sources */,
 				35D2A6752E4CC232004BCF95 /* TaskDetailPresenter.swift in Sources */,
 				35D2A65A2E4BF83F004BCF95 /* ToDoModel.xcdatamodeld in Sources */,

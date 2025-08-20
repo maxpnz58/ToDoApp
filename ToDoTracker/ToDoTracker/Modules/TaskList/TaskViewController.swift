@@ -174,8 +174,9 @@ extension TasksViewController: UITableViewDelegate {
                 self.presenter?.didSelectTask(id: viewModel.id)
             }
 
-            let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-                print("Поделиться \(viewModel.title)")
+            let shareAction = UIAction(title: "Поделиться", image: UIImage(systemName: "square.and.arrow.up")) { [weak self] _ in
+                guard let self = self else { return }
+                self.presenter?.didShareTask(viewModel)
             }
 
             let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { _ in

@@ -23,6 +23,7 @@ protocol TasksPresenterProtocol: AnyObject {
     func didTapAddTask()
     func didToggleComplete(id: Int64)
     func search(query: String)
+    func didShareTask(_ task: TaskViewModel)
 }
 
 protocol TasksInteractorProtocol: AnyObject {
@@ -37,5 +38,6 @@ protocol TasksRouterProtocol: AnyObject {
     static func createModule() -> TasksViewController
     func navigateToTaskDetail(from view: TasksViewProtocol, with task: TaskModel)
     func navigateToNewTaskDetail(from view: TasksViewProtocol)
+    func presentShare(from view: TasksViewProtocol, text: String)
 }
 

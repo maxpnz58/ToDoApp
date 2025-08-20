@@ -50,10 +50,11 @@ final class TaskTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        selectionStyle = .none
+        selectionStyle = .default
         setupUI()
+        setupSelectedBackground()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         selectionStyle = .none
@@ -111,6 +112,14 @@ final class TaskTableViewCell: UITableViewCell {
             dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
             dateLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 4)
         ])
+    }
+    
+    private func setupSelectedBackground() {
+        let bgView = UIView()
+        bgView.backgroundColor = UIColor.systemGray5
+        bgView.layer.cornerRadius = 16
+        bgView.layer.masksToBounds = true
+        self.selectedBackgroundView = bgView
     }
     
     @objc private func toggleComplete() {
