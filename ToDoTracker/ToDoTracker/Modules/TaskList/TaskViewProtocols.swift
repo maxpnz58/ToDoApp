@@ -35,7 +35,7 @@ protocol TasksInteractorProtocol: AnyObject {
 
 protocol TasksRouterProtocol: AnyObject {
     static func createModule() -> TasksViewController
-    func navigateToTaskDetail(from view: TasksViewProtocol, with TaskModel: Int64)
+    func navigateToTaskDetail(from view: TasksViewProtocol, with task: TaskModel)
     func navigateToNewTaskDetail(from view: TasksViewProtocol)
 }
 

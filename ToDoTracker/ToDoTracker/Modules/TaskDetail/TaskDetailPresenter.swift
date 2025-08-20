@@ -31,7 +31,6 @@ final class TaskDetailPresenter: TaskDetailPresenterProtocol {
     func didUpdateTask(title: String, description: String?, completion: @escaping (Result<Void, Error>) -> Void) {
         if isNewTask {
             let newTask = TaskModel(id: (Int64(Date().timeIntervalSince1970)), title: title, details: description, createdAt: Date(), completed: false)
-            print("created task with: newTask \(newTask)")
             interactor?.createTask(newTask) { [weak self] result in
                 if case .success = result {
                     self?.delegate?.didCreateTask(newTask)

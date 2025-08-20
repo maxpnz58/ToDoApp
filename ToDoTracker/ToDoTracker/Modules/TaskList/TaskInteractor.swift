@@ -95,8 +95,6 @@ final class TasksInteractor: TasksInteractorProtocol {
             fetchRequest.predicate = NSPredicate(format: "id == %d", taskId)
             fetchRequest.fetchLimit = 1
             
-            print("Trying to delete task withId: \(taskId)")
-            
             do {
                 if let taskToDelete = try ctx.fetch(fetchRequest).first {
                     ctx.delete(taskToDelete)

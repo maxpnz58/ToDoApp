@@ -30,8 +30,9 @@ final class TasksPresenter: TasksPresenterProtocol {
     }
 
     func didSelectTask(id: Int64) {
-        guard let view = view else { return }
-        router?.navigateToTaskDetail(from: view, with: id)
+        guard let view = view,
+              let task = tasks.first(where: { $0.id == id }) else { return }
+        router?.navigateToTaskDetail(from: view, with: task)
     }
     
     func didTapAddTask() {
@@ -85,20 +86,6 @@ final class TasksPresenter: TasksPresenterProtocol {
             interactor?.fetchAllTasks(completion: fetchCompletion)
         } else {
             interactor?.searchTasks(query: query, completion: fetchCompletion)
-        }
-    }
-}
-
-extension TasksPresenter: TaskDetailDelegate {
-    func didCreateTask(_ task: TaskModel) {
-        tasks.insert(task, at: 0) // или куда нужно
-        view?.insertTask(with: TaskViewModel(from: task), at: 0)
-    }
-
-    func didUpdateTask(_ task: TaskModel) {
-        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-            tasks[index] = task
-            view?.updateTask(withId: task.id, viewModel: TaskViewModel(from: task))
         }
     }
 }
