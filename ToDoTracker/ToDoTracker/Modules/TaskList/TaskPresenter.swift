@@ -13,7 +13,7 @@ final class TasksPresenter: TasksPresenterProtocol {
     var interactor: TasksInteractorProtocol?
     var router: TasksRouterProtocol?
     
-    private var tasks: [TaskModel] = []
+    private var taskViewModels: [TaskViewModel] = []
     private var currentQuery: String = ""
 
     func viewDidLoad() {
@@ -31,8 +31,8 @@ final class TasksPresenter: TasksPresenterProtocol {
 
     func didSelectTask(id: Int64) {
         guard let view = view,
-              let task = tasks.first(where: { $0.id == id }) else { return }
-        router?.navigateToTaskDetail(from: view, with: task)
+              let taskModel = taskViewModels.first(where: { $0.id == id }).map({ TaskModel(id: $0.id, title: $0.title, details: $0.description == "Описание задачи отсутствует" ? nil : $0.description, createdAt: Date(), completed: $0.completed) }) else { return }  // Конверт back to TaskModel
+        router?.navigateToTaskDetail(from: view, with: taskModel)
     }
     
     func didTapAddTask() {
@@ -41,30 +41,29 @@ final class TasksPresenter: TasksPresenterProtocol {
     }
 
     func didDeleteTask(id: Int64) {
-        guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
-        let oldTask = tasks[index]
-        tasks.remove(at: index)
+        guard let index = taskViewModels.firstIndex(where: { $0.id == id }) else { return }
+        let oldVM = taskViewModels[index]
+        taskViewModels.remove(at: index)
         view?.deleteTask(withId: id)
         interactor?.deleteTask(byId: id) { [weak self] result in
             if case .failure(let error) = result {
-                self?.tasks.insert(oldTask, at: index)
-                self?.view?.insertTask(with: TaskViewModel(from: oldTask), at: index)
+                self?.taskViewModels.insert(oldVM, at: index)
+                self?.view?.insertTask(with: oldVM, at: index)
                 self?.view?.showError(message: error.localizedDescription)
             }
         }
     }
 
     func didToggleComplete(id: Int64) {
-        guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
-        let oldTask = tasks[index]
-        var newTask = oldTask
-        newTask.completed.toggle()
-        tasks[index] = newTask
-        view?.updateTask(withId: id, viewModel: TaskViewModel(from: newTask))
-        interactor?.updateTask(newTask) { [weak self] result in
+        guard var vm = taskViewModels.first(where: { $0.id == id }) else { return }
+        let oldCompleted = vm.completed
+        vm.completed.toggle()
+        view?.reloadTask(withId: id)
+        let taskModel = TaskModel(id: id, title: vm.title, details: vm.description == "Описание задачи отсутствует" ? nil : vm.description, createdAt: Date(), completed: vm.completed)  // Конверт to TaskModel for save
+        interactor?.updateTask(taskModel) { [weak self] result in
             if case .failure(let error) = result {
-                self?.tasks[index] = oldTask
-                self?.view?.updateTask(withId: id, viewModel: TaskViewModel(from: oldTask))
+                vm.completed = oldCompleted
+                self?.view?.reloadTask(withId: id)
                 self?.view?.showError(message: error.localizedDescription)
             }
         }
@@ -75,9 +74,8 @@ final class TasksPresenter: TasksPresenterProtocol {
         let fetchCompletion: (Result<[TaskModel], Error>) -> Void = { [weak self] result in
             switch result {
             case .success(let fetchedTasks):
-                self?.tasks = fetchedTasks
-                let viewModels = fetchedTasks.map { TaskViewModel(from: $0) }
-                self?.view?.showTasks(viewModels)
+                self?.taskViewModels = fetchedTasks.map { TaskViewModel(from: $0) }
+                self?.view?.showTasks(self?.taskViewModels ?? [])
             case .failure(let error):
                 self?.view?.showError(message: error.localizedDescription)
             }

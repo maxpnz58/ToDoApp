@@ -9,7 +9,7 @@ import Foundation
 
 protocol TasksViewProtocol: AnyObject {
     func showTasks(_ viewModels: [TaskViewModel])
-    func updateTask(withId id: Int64, viewModel: TaskViewModel)
+    func reloadTask(withId id: Int64)
     func deleteTask(withId id: Int64)
     func insertTask(with viewModel: TaskViewModel, at index: Int)
     func showError(message: String)

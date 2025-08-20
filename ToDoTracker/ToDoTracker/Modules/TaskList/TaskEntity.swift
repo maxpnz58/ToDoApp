@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct TaskViewModel: Hashable {
+class TaskViewModel: Hashable {
     let id: Int64
     let title: String
     let description: String
     let dateString: String
-    let completed: Bool
+    var completed: Bool
     
     init(from model: TaskModel) {
         self.id = model.id

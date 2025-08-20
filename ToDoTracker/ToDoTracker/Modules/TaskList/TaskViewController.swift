@@ -201,10 +201,10 @@ extension TasksViewController: TasksViewProtocol {
         updateCounter()
     }
     
-    func updateTask(withId id: Int64, viewModel: TaskViewModel) {
+    func reloadTask(withId id: Int64) {
         var snapshot = dataSource.snapshot()
-        if snapshot.itemIdentifiers.contains(where: { $0.id == id }) {
-            snapshot.reloadItems([viewModel])
+        if let item = snapshot.itemIdentifiers.first(where: { $0.id == id }) {
+            snapshot.reloadItems([item])
             dataSource.apply(snapshot, animatingDifferences: false)
         }
         updateCounter()
