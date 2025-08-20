@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		355278CA2E55323D00416BB4 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355278C92E55323D00416BB4 /* TaskEntity.swift */; };
 		355278CB2E55323D00416BB4 /* TaskEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355278C92E55323D00416BB4 /* TaskEntity.swift */; };
+		355278DA2E55F77B00416BB4 /* TaskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A6262E4BB7BC004BCF95 /* TaskModel.swift */; };
+		355278DD2E55F83D00416BB4 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A6282E4BB873004BCF95 /* CoreDataStack.swift */; };
+		355278DE2E55F85800416BB4 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A6342E4BD2F5004BCF95 /* NetworkService.swift */; };
+		355278DF2E55F87300416BB4 /* ToDoModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A6582E4BF83F004BCF95 /* ToDoModel.xcdatamodeld */; };
+		355278E02E55F87B00416BB4 /* ApiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A6242E4BB78B004BCF95 /* ApiModel.swift */; };
+		355278E12E55F8B700416BB4 /* Date+Extentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A66E2E4CC0A8004BCF95 /* Date+Extentions.swift */; };
 		35D2A6132E4BB39C004BCF95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A60A2E4BB39C004BCF95 /* Assets.xcassets */; };
 		35D2A6202E4BB3D7004BCF95 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 35D2A61D2E4BB3D7004BCF95 /* LaunchScreen.storyboard */; };
 		35D2A6212E4BB3D7004BCF95 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A61B2E4BB3D7004BCF95 /* AppDelegate.swift */; };
@@ -460,19 +466,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				35D2A6732E4CC1E1004BCF95 /* TaskDetailViewProtocols.swift in Sources */,
+				355278E02E55F87B00416BB4 /* ApiModel.swift in Sources */,
 				35D2A6642E4BFAF0004BCF95 /* TaskTableViewCell.swift in Sources */,
 				35D2A6412E4BD53E004BCF95 /* TaskRouter.swift in Sources */,
+				355278DD2E55F83D00416BB4 /* CoreDataStack.swift in Sources */,
 				35D2A63B2E4BD417004BCF95 /* TaskInteractor.swift in Sources */,
 				35D2A65D2E4BF8F0004BCF95 /* TaskEntity+CoreDataClass.swift in Sources */,
 				35D2A6792E4CC244004BCF95 /* TaskDetailInteractor.swift in Sources */,
 				35D2A65E2E4BF8F0004BCF95 /* TaskEntity+CoreDataProperties.swift in Sources */,
 				35D2A63E2E4BD433004BCF95 /* TaskPresenter.swift in Sources */,
+				355278E12E55F8B700416BB4 /* Date+Extentions.swift in Sources */,
+				355278DF2E55F87300416BB4 /* ToDoModel.xcdatamodeld in Sources */,
 				35D2A67B2E4CC276004BCF95 /* TaskDetailViewController.swift in Sources */,
 				35D2A67F2E4CC2B3004BCF95 /* TaskDetailRouter.swift in Sources */,
 				35D2A6762E4CC232004BCF95 /* TaskDetailPresenter.swift in Sources */,
 				35D2A6452E4BD551004BCF95 /* TaskViewController.swift in Sources */,
 				355278CB2E55323D00416BB4 /* TaskEntity.swift in Sources */,
+				355278DE2E55F85800416BB4 /* NetworkService.swift in Sources */,
 				35D2A6392E4BD399004BCF95 /* TaskViewProtocols.swift in Sources */,
+				355278DA2E55F77B00416BB4 /* TaskModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
